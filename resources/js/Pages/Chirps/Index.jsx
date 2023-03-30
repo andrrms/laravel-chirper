@@ -32,7 +32,7 @@ export default function Index({ auth, chirps }) {
     }
 
     useEffect(() => {
-        timeoutRef.current = setInterval(handleUpdate, 1000 * 1);
+        timeoutRef.current = setInterval(handleUpdate, 1000 * 60);
 
         return () => {
             clearInterval(timeoutRef.current);
