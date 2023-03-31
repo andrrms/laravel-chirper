@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useForm, usePage } from "@inertiajs/react";
+import { router, useForm, usePage } from "@inertiajs/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
@@ -14,6 +14,7 @@ export default function Chirp({ chirp }) {
 
     const { auth } = usePage().props;
 
+    const { post } = useForm();
     const { data, setData, patch, clearErrors, reset, errors } = useForm({
         message: chirp.message,
     });
@@ -27,6 +28,26 @@ export default function Chirp({ chirp }) {
         patch(route("chirps.update", chirp.id), {
             onSuccess() {
                 setEditing(false);
+            },
+        });
+    }
+
+    /**
+     *
+     * @param {MouseEvent} e
+     */
+    function handleLike(e) {
+        e.preventDefault();
+
+        post(route("chirp.like", chirp.id), {
+            onSuccess() {
+                console.log("deu certo");
+                router.reload({
+                    only: ["chirps"],
+                });
+            },
+            onError(e) {
+                console.error(e);
             },
         });
     }
@@ -100,7 +121,7 @@ export default function Chirp({ chirp }) {
                             onChange={(e) => setData("message", e.target.value)}
                             className="mt-4 w-full text-gray-900 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
                         ></textarea>
-                        <InputError message={errors.message} class="mt-2" />
+                        <InputError message={errors.message} className="mt-2" />
                         <div className="space-x-2">
                             <PrimaryButton className="mt-4">Save</PrimaryButton>
                             <button
@@ -120,6 +141,30 @@ export default function Chirp({ chirp }) {
                         {chirp.message}
                     </p>
                 )}
+                <div className="flex-1">
+                    <div className="flex items-center gap-4">
+                        <p>{chirp.likes.length} likes</p>
+                        <button
+                            className="inline-flex items-center px-4 py-2 gap-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-black uppercase tracking-widest hover:bg-gray-300 focus:bg-gray-400 active:bg-gray-900 active:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 false mt-4"
+                            onClick={handleLike}
+                        >
+                            <svg
+                                viewBox="0 0 24 24"
+                                width="16"
+                                height="16"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="css-i6dzq1"
+                            >
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                            <span>Like</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );

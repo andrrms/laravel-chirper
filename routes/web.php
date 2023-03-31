@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChirpLikeController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -37,8 +38,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::resource('chirps', ChirpController::class)
-    ->only(['index', 'store', 'update', 'destroy'])
-    ->middleware(['auth', 'verified']);
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/chirp/{chirp_id}/like', [ChirpController::class, 'likeChirp'])
+        ->name('chirp.like');
+    Route::resource('chirps', ChirpController::class)
+        ->only(['index', 'store', 'update', 'destroy']);
+});
 
 require __DIR__ . '/auth.php';

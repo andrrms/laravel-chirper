@@ -50,4 +50,27 @@ class User extends Authenticatable
     {
         return $this->hasMany(Chirp::class);
     }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Likes::class);
+    }
+
+    public function likeChirp(Chirp $chirp)
+    {
+        $like = $this->likes()->findOrNew([
+            'user_id' => auth()->id(),
+            'chirp_id' => $chirp->id,
+        ]);
+
+        return $like;
+    }
+
+    public function unlikeChirp(Chirp $chirp)
+    {
+        return $this->likes()->where([
+            'user_id' => auth()->id(),
+            'chirp_id' => $chirp->id,
+        ])->delete();
+    }
 }

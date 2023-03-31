@@ -18,7 +18,7 @@ class ChirpController extends Controller
     {
         //
         return Inertia::render('Chirps/Index', [
-            'chirps' => fn() => Chirp::with('user:id,name')->latest()->get()
+            'chirps' => fn() => Chirp::with(['user:id,name', 'likes'])->latest()->get()
         ]);
     }
 
@@ -84,6 +84,15 @@ class ChirpController extends Controller
         $this->authorize('delete', $chirp);
 
         $chirp->deleteOrFail();
+
+        return redirect(route('chirps.index'));
+    }
+
+    public function likeChirp(Request $request, int $chirp_id)
+    {
+        $request->user()->likeChirp(
+            Chirp::all()->firstOrFail('id', $chirp_id)
+        );
 
         return redirect(route('chirps.index'));
     }
